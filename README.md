@@ -58,11 +58,10 @@ A comprehensive client-side banking application built with JavaScript, HTML5, an
 ### 📁 Folder Structure
 ```
 Modern-Banking-System/
-├── HTML/
-│   ├── index.html          # Main dashboard
-│   ├── login.html          # User login page
-│   ├── register.html       # User registration page
-│   └── admin.html          # Admin panel
+├── index.html          # Main dashboard
+├── login.html          # User login page
+├── register.html       # User registration page
+├── admin.html          # Admin panel
 ├── Java Script/
 │   ├── classes.js          # OOP class definitions
 │   ├── data_structures.js  # Custom data structures
