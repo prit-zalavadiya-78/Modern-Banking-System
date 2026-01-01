@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-100">
+
+    <div id="register-page" class="page">
+        <div class="bg-white p-8 rounded-xl shadow-lg max-w-md mx-auto mt-10">
+            <h1 class="text-3xl font-bold text-slate-800 text-center mb-2">Create Your Account</h1>
+            <p class="text-slate-500 text-center mb-6">Join us and start managing your finances.</p>
+            <form id="registerForm">
+                <div class="mb-4">
+                    <label for="register-name" class="block text-sm font-medium text-slate-600 mb-1">Full
+                        Name</label>
+                    <input type="text" id="register-name" class="w-full p-3 border border-slate-300 rounded-lg"
+                        required>
+                </div>
+                <div class="mb-4">
+                    <label for="register-email" class="block text-sm font-medium text-slate-600 mb-1">Email</label>
+                    <input type="email" id="register-email" class="w-full p-3 border border-slate-300 rounded-lg"
+                        required>
+                </div>
+                <div class="mb-4">
+                    <label for="register-password"
+                        class="block text-sm font-medium text-slate-600 mb-1">Password</label>
+                    <input type="password" id="register-password"
+                        class="w-full p-3 border border-slate-300 rounded-lg" required>
+                </div>
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-slate-600 mb-1">Enter the text below</label>
+                    <div class="flex items-center gap-3">
+                        <canvas id="captcha-canvas" width="150" height="50"></canvas>
+                        <button type="button" id="reload-captcha"
+                            class="p-2 bg-slate-200 rounded-lg hover:bg-slate-300">&#x21bb;</button>
+                    </div>
+                    <input type="text" id="register-captcha"
+                        class="w-full p-3 mt-2 border border-slate-300 rounded-lg" required>
+                </div>
+                <p id="register-error" class="text-red-500 text-center text-sm mb-4 h-4"></p>
+                <button type="submit"
+                    class="w-full bg-indigo-600 text-white font-bold py-3 px-5 rounded-lg shadow-md hover:bg-indigo-700">Register</button>
+            </form>
+            <p class="text-center text-sm text-slate-500 mt-6">
+                Already have an account? <a href="login.html"
+                    class="font-semibold text-indigo-600 hover:underline">Login here</a>
+            </p>
+        </div>
+    </div>
+
+    <script src="../Java Script/classes.js"></script>
+    <script>
+        let captchaText = '';
+        const registerCaptchaInput = document.getElementById('register-captcha');
+        const registerError = document.getElementById('register-error');
+        const captchaCanvas = document.getElementById('captcha-canvas');
+        const reloadCaptchaBtn = document.getElementById('reload-captcha');
+
+        function generateCaptcha() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            let text = '';
+            for (let i = 0; i < 6; i++) {
+                text += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            captchaText = text;
+            const ctx = captchaCanvas.getContext('2d');
+            ctx.clearRect(0, 0, captchaCanvas.width, captchaCanvas.height);
+            ctx.fillStyle = '#f1f5f9';
+            ctx.fillRect(0, 0, captchaCanvas.width, captchaCanvas.height);
+            ctx.font = 'bold 30px Inter, sans-serif';
+            ctx.fillStyle = '#475569';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(captchaText, captchaCanvas.width / 2, captchaCanvas.height / 2);
+            for(let i=0; i<5; i++) {
+                ctx.beginPath();
+                ctx.moveTo(Math.random() * captchaCanvas.width, Math.random() * captchaCanvas.height);
+                ctx.lineTo(Math.random() * captchaCanvas.width, Math.random() * captchaCanvas.height);
+                ctx.strokeStyle = '#cbd5e1';
+                ctx.stroke();
+            }
+        }
+        if (reloadCaptchaBtn) reloadCaptchaBtn.addEventListener('click', generateCaptcha);
+
+        document.getElementById("registerForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            if (registerCaptchaInput.value !== captchaText) {
+                if (registerError) registerError.textContent = 'CAPTCHA does not match.';
+                generateCaptcha();
+                return;
+            }
+
+            const name = document.getElementById("register-name").value;
+            const email = document.getElementById("register-email").value;
+            const password = document.getElementById("register-password").value;
+
+            if(localStorage.getItem(email+"_")!==null)
+            {
+                alert("Email is already registered !! ");
+            }
+            else 
+            {
+                var len=password.length;
+                if(len>16||len<8) {
+                    alert("Password size must be 8 to 16");
+                }
+                else {
+                    let accno = Math.floor(1e13 + Math.random() * 9e13);
+                    let admin = localStorage.getItem('admin');
+                    if(admin){
+                        admin = JSON.parse(admin);
+                        let isThere = "no";
+                        admin.users.forEach(element => {
+                            if(element.accountNumber == accno){
+                                isThere = "yes";
+                            }
+                        });
+                        while(isThere == "yes"){
+                            accno = Math.floor(1e13 + Math.random() * 9e13);
+                            isThere = "no";
+                            admin.users.forEach(element => {
+                                if(element.accountNumber == accno){
+                                    isThere = "yes";
+                                }
+                            });
+                        }
+                    }
+                    let user = new User(email, password, name, (accno), 1000);
+                    user.cards.push(new DebitCard(name));
+                    user.cards.push(new CreditCard(name));
+                    localStorage.setItem(email+"_", JSON.stringify(user));
+
+                    const existingAdminData = JSON.parse(localStorage.getItem('admin')) || (new Admin());
+                    existingAdminData.users.push({accountNumber:accno, email});
+                    localStorage.setItem('admin', JSON.stringify(existingAdminData));
+
+
+                    alert("Registration successful!");
+                    sessionStorage.setItem("user", email+'_');
+                    window.location.href = "index.html"; 
+                    // window.location.href = "login.html";
+                }
+            } 
+        });
+
+        window.onload = (event) => {
+            generateCaptcha();
+        };
+    </script>
+</body>
+</html>
