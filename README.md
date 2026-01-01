@@ -8,7 +8,7 @@ A comprehensive client-side banking application built with JavaScript, HTML5, an
 
 ## 🌐 Live Demo
 
-🔗 **[View Live Demo](https://prit-zalavadiya-78.github.io/Modern-Banking-System/HTML/login.html)**
+🔗 **[View Live Demo](https://prit-zalavadiya-78.github.io/Modern-Banking-System/login.html)**
 
 ---
 
